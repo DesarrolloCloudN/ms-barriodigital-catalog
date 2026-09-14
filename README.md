@@ -1,7 +1,7 @@
 # BarrioDigital — Microservicio de Catálogo
 
 Microservicio de dominio del sistema BarrioDigital, encargado del catálogo de tipos de trámite y sus cupos
-diarios. Construido con Spring Boot y Spring Data JPA sobre Oracle en Amazon RDS.
+diarios. Construido con Spring Boot y Spring Data JPA sobre Oracle Autonomous Database.
 
 ## Responsabilidad
 
@@ -23,7 +23,7 @@ solo lo consume `ms-barriodigital-bff`.
 ## Configuración
 
 Corre en el puerto `8082`. Necesita las variables de entorno `ORACLE_DB_URL`, `ORACLE_DB_USER` y
-`ORACLE_DB_PASSWORD` para conectarse a Oracle en Amazon RDS.
+`ORACLE_DB_PASSWORD` para conectarse a Oracle Autonomous Database.
 
 ## Ejecutar localmente
 
