@@ -10,9 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-// Service: acá vive la lógica de negocio de los tipos de trámite (crear,
-// listar, actualizar y manejar los cupos diarios). El controller solo
-// delega el trabajo a esta clase.
+// Lógica de negocio de tipos de trámite; el controller solo delega aquí.
 @Service
 public class TipoTramiteService {
 
@@ -22,20 +20,15 @@ public class TipoTramiteService {
 		this.tipoTramiteRepository = tipoTramiteRepository;
 	}
 
-	// Devuelve todos los tipos de trámite guardados.
 	public List<TipoTramite> listar() {
 		return tipoTramiteRepository.findAll();
 	}
 
-	// Busca un tipo de trámite por id. Si no existe, lanza una excepción
-	// que más adelante el GlobalExceptionHandler convierte en HTTP 404.
 	public TipoTramite obtener(Long id) {
 		return tipoTramiteRepository.findById(id)
 				.orElseThrow(() -> new TipoTramiteNoEncontradoException("No existe un tipo de trámite con id " + id));
 	}
 
-	// Crea un tipo de trámite nuevo. El constructor de TipoTramite ya se
-	// encarga de dejar el cupo disponible de hoy igual al cupo diario.
 	public TipoTramite crear(TipoTramiteCrearRequest request) {
 		TipoTramite tipoTramite = new TipoTramite(
 				request.nombre(),
@@ -46,9 +39,7 @@ public class TipoTramiteService {
 		return tipoTramiteRepository.save(tipoTramite);
 	}
 
-	// Actualiza los datos generales de un tipo de trámite existente. Ojo
-	// que esto reemplaza el cupoDiario, pero no toca el cupoDisponibleHoy
-	// directamente (ese se maneja aparte con decrementarCupo/reponerCupo).
+	// Actualiza cupoDiario pero no toca cupoDisponibleHoy (se maneja aparte).
 	public TipoTramite actualizar(Long id, TipoTramiteActualizarRequest request) {
 		TipoTramite tipoTramite = obtener(id);
 		tipoTramite.setNombre(request.nombre());
@@ -59,9 +50,7 @@ public class TipoTramiteService {
 		return tipoTramiteRepository.save(tipoTramite);
 	}
 
-	// Descuenta un cupo disponible de hoy (se usa cada vez que se crea un
-	// trámite de este tipo). Si ya no queda cupo (0 o menos), no se deja
-	// descontar más y se lanza CupoAgotadoException.
+	// Descuenta un cupo; si ya no queda (<=0) lanza CupoAgotadoException.
 	public TipoTramite decrementarCupo(Long id) {
 		TipoTramite tipoTramite = obtener(id);
 		Integer cupoDisponibleHoy = tipoTramite.getCupoDisponibleHoy();
@@ -72,16 +61,13 @@ public class TipoTramiteService {
 		return tipoTramiteRepository.save(tipoTramite);
 	}
 
-	// Vuelve a dejar el cupo disponible de hoy en el máximo configurado
-	// (cupoDiario). No suma de a uno: directamente resetea el contador,
-	// por ejemplo para cuando empieza un nuevo día.
+	// Resetea cupoDisponibleHoy al máximo (cupoDiario), no suma de a uno.
 	public TipoTramite reponerCupo(Long id) {
 		TipoTramite tipoTramite = obtener(id);
 		tipoTramite.setCupoDisponibleHoy(tipoTramite.getCupoDiario());
 		return tipoTramiteRepository.save(tipoTramite);
 	}
 
-	// Elimina un tipo de trámite de la base de datos.
 	public void eliminar(Long id) {
 		TipoTramite tipoTramite = obtener(id);
 		tipoTramiteRepository.delete(tipoTramite);

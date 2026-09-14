@@ -7,14 +7,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-// Representa un tipo de trámite (por ejemplo "Certificado de residencia"),
-// junto con cuántos cupos tiene disponibles por día. @Entity + @Table le
-// dicen a JPA que esta clase se guarda en la tabla TIPOS_TRAMITE.
+// Tipo de trámite (ej. Certificado de residencia) con cupos por día.
 @Entity
 @Table(name = "TIPOS_TRAMITE")
 public class TipoTramite {
 
-	// Id autogenerado por la base de datos (autoincremental).
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -28,34 +25,22 @@ public class TipoTramite {
 	@Column(name = "REQUISITOS", length = 2000)
 	private String requisitos;
 
-	// Cupo máximo de trámites de este tipo que se pueden atender por día.
-	// Este número es fijo hasta que alguien lo cambie con un PUT.
+	// Cupo máximo por día; solo cambia mediante un PUT explícito.
 	@Column(name = "CUPO_DIARIO", nullable = false)
 	private Integer cupoDiario;
 
-	// Cupo que va quedando disponible durante el día de hoy. Se guarda
-	// aparte de cupoDiario porque cupoDiario es el máximo configurado (no
-	// cambia solo), mientras que cupoDisponibleHoy va bajando cada vez que
-	// se crea un trámite (decrementarCupo) y se puede volver a llenar
-	// (reponerCupo), por ejemplo al empezar un nuevo día o si se cancela
-	// un trámite.
+	// Cupo que baja con cada trámite y se resetea aparte de cupoDiario.
 	@Column(name = "CUPO_DISPONIBLE_HOY", nullable = false)
 	private Integer cupoDisponibleHoy;
 
-	// Indica si este tipo de trámite se puede seguir usando o si está dado
-	// de baja.
 	@Column(name = "ACTIVO", nullable = false)
 	private Boolean activo;
 
-	// Constructor vacío que pide JPA internamente para poder crear los
-	// objetos cuando lee desde la base de datos. No se usa directamente.
+	// Constructor vacío que exige JPA; no se usa directamente en el código.
 	protected TipoTramite() {
-		// requerido por JPA
 	}
 
-	// Constructor que se usa al crear un tipo de trámite nuevo. Al crearlo,
-	// el cupo disponible de hoy arranca igual al cupo diario configurado,
-	// y queda activo por defecto.
+	// Al crear, cupoDisponibleHoy arranca igual a cupoDiario y activo=true.
 	public TipoTramite(String nombre, String descripcion, String requisitos, Integer cupoDiario) {
 		this.nombre = nombre;
 		this.descripcion = descripcion;
